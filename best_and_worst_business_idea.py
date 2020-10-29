@@ -1,19 +1,39 @@
 #!/usr/bin/env python 
 # -*- coding:utf-8 -*-
 
-import nltk
 import pandas as pd
-from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+import numpy as np
+import glob
+import os
+import nltk
+nltk.download('vader_lexicon')
+from nltk.sentiment.vader import SentimentIntensityAnalyzer
 
-Data = pd.read_csv('MergedCompanies.csv')
-analyser = SentimentIntensityAnalyzer()
-def sentiment_analysis(text):
-    return analyser.polarity_scores(text)
+if(os.path.exists("MergedCompanies.csv")):
+    data_frame = pd.read_csv("MergedCompanies.csv")
+else:
+    print("File not Found, please run MergeAllCSV.py first!")
+    os._exit()
 
-for sen in Data:
-    print(sen)
-    ss = analyser.polarity_scores(sen)
-    for k in ss:
-        print('{0}:{1},'.format(k, ss[k]), end='')
-    print()
+all_Descrption = data_frame["Purpose"].values
+grader = SentimentIntensityAnalyzer()
+best_grade = float('-inf') 
+best_idea = ""
+worst_grade = float('-inf') 
+worst_idea = ""
+for items in all_Descrption:
+    current_grade = grader.polarity_scores(items)["compound"]
+    if worst_grade == float('-inf') :
+        worst_grade = current_grade
+        worst_idea = items
+    if current_grade>best_grade :
+        best_grade = current_grade
+        best_idea = items
+    elif current_grade< worst_grade:
+        worst_grade = current_grade
+        worst_idea = items
+print ("Best idea: "+best_idea)
+print ("Worst idea: "+worst_idea)
+    
+    
 
